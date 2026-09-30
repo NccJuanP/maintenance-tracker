@@ -61,7 +61,11 @@ builder.Services
         options.InvalidModelStateResponseFactory = InvalidModelStateResponse.Create);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new() { Title = "MaintenanceTracker API", Version = "v1" });
+    options.OperationFilter<UserIdHeaderOperationFilter>();
+});
 
 var app = builder.Build();
 

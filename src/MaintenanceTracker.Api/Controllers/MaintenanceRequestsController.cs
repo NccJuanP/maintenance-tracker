@@ -11,6 +11,7 @@ namespace MaintenanceTracker.Api.Controllers;
 public sealed class MaintenanceRequestsController(ICurrentUserProvider currentUser) : ControllerBase
 {
     [HttpPost]
+    [ProducesResponseType<MaintenanceRequestDetail>(StatusCodes.Status201Created)]
     public async Task<ActionResult<MaintenanceRequestDetail>> CreateAsync(
         CreateMaintenanceRequestBody body,
         [FromServices] CreateMaintenanceRequest createMaintenanceRequest,

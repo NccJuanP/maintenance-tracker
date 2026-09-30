@@ -104,7 +104,7 @@ Flujo de un comando de escritura:
 **T9.** CQRS ligero, sin librerías:
 
 - **Escrituras** pasan por `IMaintenanceRequestRepository` (obtener por id, agregar) y una unidad de trabajo (`IUnitOfWork.SaveChangesAsync`). El repositorio existe solo para el agregado.
-- **Lecturas** pasan por `IMaintenanceRequestQueries`, que proyecta directamente a los modelos de respuesta con `Select`, sin cargar agregados ni rastrear entidades.
+- **Lecturas** pasan por `IMaintenanceRequestQueries`, que proyecta directamente a los modelos de respuesta con `Select`, sin cargar agregados ni rastrear entidades. El historial es la excepción (T32).
 - **Usuarios**: `IUserCatalog` para verificar existencia y listar.
 
 Todas estas interfaces se definen en `Application` y se implementan en `Infrastructure` (inversión de dependencias).
@@ -112,6 +112,8 @@ Todas estas interfaces se definen en `Application` y se implementan en `Infrastr
 **T10.** Los modelos de respuesta (`MaintenanceRequestDetail`, `MaintenanceRequestListItem`, `ActivityEntryDto` y derivados, `PagedResult<T>`, `RequestSummary`, `UserSummary`) se definen en `Application` como `record` y la API los serializa tal cual, porque coinciden 1:1 con el contrato. Los cuerpos de petición se definen en `Api` y el controlador los convierte en comandos. Nunca se exponen entidades del dominio ni de persistencia. El mapeo es manual, sin AutoMapper.
 
 **T11.** Atomicidad (requisito no funcional del enunciado): el cambio del agregado y su entrada de historial se guardan en un único `SaveChanges`, que EF Core ejecuta en una sola transacción. Si falla el insert del historial, no se persiste el cambio. No se abren transacciones explícitas porque no hacen falta.
+
+**T32.** El historial paginado no se resuelve con un solo `Select`. Primero se leen las entradas de la página sin rastreo, después los usuarios que esas entradas referencian (autor, responsable anterior y nuevo) en una segunda consulta, y los DTO se arman en memoria. Proyectar los tres subtipos con tres joins a `users` en una sola consulta resultaba mucho menos legible. El costo es una consulta más por página, con un catálogo de usuarios pequeño. Sigue sin cargar el agregado.
 
 ## 5. API
 
@@ -134,6 +136,12 @@ Serialización JSON:
 **T26.** Los parámetros de query de tipo enum (`status`, `priority`, `category`) solo aceptan el nombre del valor. El model binding de MVC acepta números (`?status=1`) y `allowIntegerValues: false` solo protege el JSON, así que un valor numérico se rechaza explícitamente con 400 `validation_failed`. Así se mantiene la convención de enums como texto (sección 5.1 del Event Storming).
 
 **T27.** Un `X-User-Id` presente pero sin formato UUID devuelve 400 `validation_failed` (tabla 5.4 del Event Storming). Es un dato mal formado, no un usuario inexistente; `user_not_found` queda para UUIDs válidos que no están en el catálogo.
+
+**T30.** Las fechas se escriben en UTC con sufijo `Z` (`2026-09-30T13:05:12.534581Z`), como en los ejemplos del contrato, mediante un convertidor JSON propio para `DateTimeOffset` en la API. El convertidor por defecto escribe `+00:00`, que también es ISO 8601 pero no coincide con los ejemplos.
+
+**T31.** Los enums de la query (T26) aceptan el nombre sin distinguir mayúsculas (`status=pending`, `sortDirection=ASC`), igual que los del cuerpo JSON, porque `JsonStringEnumConverter` tampoco distingue al leer. Números y combinaciones (`High,Low`) se rechazan. Lo resuelve un model binder propio (`EnumNameModelBinder`) que solo compara contra los nombres del enum.
+
+**T33.** `ActivityEntryDto` declara su discriminador con `[JsonPolymorphic]` y `[JsonDerivedType]` dentro de `Application`. Esos atributos vienen con .NET (`System.Text.Json`) y no con un paquete NuGet, así que la regla de T1 se mantiene. La alternativa, configurar el polimorfismo en la API con un `TypeInfoResolver`, separa mejor las capas pero es menos directa de leer. El discriminador `type` se escribe como primera propiedad de cada entrada; el orden no altera el contrato.
 
 **T13.** Manejo centralizado de errores con `IExceptionHandler` y `AddProblemDetails`:
 
@@ -229,6 +237,8 @@ Requisito para ejecutar las pruebas de integración: Docker corriendo.
 No se usan MediatR, AutoMapper, FluentValidation ni FluentAssertions (T8, T10, T6, T21).
 
 **T29.** `dotnet-ef` 8.x se fija en un manifiesto local (`.config/dotnet-tools.json`) para que la herramienta coincida con EF Core 8, sin depender de la versión global instalada en cada máquina. `dotnet tool restore` solo hace falta para crear migraciones: ejecutar la aplicación o las pruebas no lo requiere, porque las migraciones se aplican al arrancar (T19). Se documenta en el README.
+
+**T34.** `Microsoft.EntityFrameworkCore.Design` y `dotnet-ef` se fijan en la misma versión de EF Core que trae `Npgsql.EntityFrameworkCore.PostgreSQL` (8.0.11). `Design` se referencia con `PrivateAssets=all` y no llega a los proyectos que dependen de Infrastructure. Con una versión mayor, Infrastructure compilaba contra un EF Core más nuevo que el que reciben la API y las pruebas de integración, y la compilación fallaba (CS1705). Al subir de versión, los tres se actualizan juntos.
 
 ## 9. Fuera de alcance
 

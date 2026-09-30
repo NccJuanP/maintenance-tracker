@@ -9,7 +9,7 @@ Prueba técnica Full Stack Mid-Level para Expertos Seguridad LTDA: aplicación d
 ## Documentos de referencia (fuente de verdad)
 
 1. `docs/domain/event-storming.md`: lenguaje ubicuo, reglas, decisiones D1-D12, endpoints, tipos y códigos de error.
-2. `docs/architecture/tactical-design.md`: estructura, patrones, persistencia y pruebas (decisiones T1-T29).
+2. `docs/architecture/tactical-design.md`: estructura, patrones, persistencia y pruebas (decisiones T1-T34).
 
 Si una tarea contradice estos documentos, detente y pregunta antes de implementar. Si una decisión cambia, actualiza el documento correspondiente en el mismo cambio. No inventes endpoints, campos ni códigos de error que no estén en el contrato.
 
