@@ -71,7 +71,8 @@ dotnet build
 dotnet test tests/MaintenanceTracker.Domain.Tests
 dotnet test tests/MaintenanceTracker.Api.IntegrationTests   # requiere Docker corriendo
 dotnet tool restore                                         # solo para crear migraciones (T29)
-dotnet ef migrations add <Nombre> -p src/MaintenanceTracker.Infrastructure -s src/MaintenanceTracker.Api
+# la API exige una cadena de conexión al arrancar; para crear migraciones basta una ficticia
+ConnectionStrings__Default="Host=localhost" dotnet ef migrations add <Nombre> -p src/MaintenanceTracker.Infrastructure -s src/MaintenanceTracker.Api -o Persistence/Migrations
 docker compose up -d --build
 ```
 
