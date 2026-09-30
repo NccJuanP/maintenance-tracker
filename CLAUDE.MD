@@ -55,7 +55,7 @@ Prohibidas: MediatR, AutoMapper, FluentValidation, FluentAssertions. No agregues
 - Métodos asíncronos con sufijo `Async` y `CancellationToken` propagado hasta EF Core.
 - Entidades de dominio sin setters públicos; se modifican solo por sus métodos.
 - Fechas siempre en UTC (`DateTimeOffset`), obtenidas de `TimeProvider` en la capa de aplicación.
-- Sin comentarios obvios. Sí comentar el *porqué* de decisiones no evidentes, citando su ID (por ejemplo `// D6: iniciar el trabajo exige responsable`).
+- Sin comentarios obvios ni comentarios que citen IDs de decisiones (`D6`, `T4`, etc.): las decisiones evolucionan y esas referencias quedan desactualizadas. La trazabilidad vive en `docs/`.
 
 ## Infraestructura y ejecución
 
