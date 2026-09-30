@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MaintenanceTracker.Api.Errors;
@@ -29,11 +30,12 @@ internal static class InvalidModelStateResponse
         };
     }
 
-    // JSON errors come keyed by path ("$.title"); the contract uses the plain field name.
+    // JSON errors come keyed by path ("$.title") and attribute errors by the C# name ("Title");
+    // the contract uses the field name as the client sent it.
     private static string FieldName(string key) => key switch
     {
         "" or "$" => "body",
         _ when key.StartsWith("$.", StringComparison.Ordinal) => key[2..],
-        _ => key
+        _ => JsonNamingPolicy.CamelCase.ConvertName(key)
     };
 }

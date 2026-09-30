@@ -1,9 +1,10 @@
 using System.Text.Json.Serialization;
 using MaintenanceTracker.Api.CurrentUser;
 using MaintenanceTracker.Api.Errors;
+using MaintenanceTracker.Api.Serialization;
+using MaintenanceTracker.Application.MaintenanceRequests;
 using MaintenanceTracker.Application.Users;
 using MaintenanceTracker.Infrastructure;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +16,12 @@ var allowedOrigins = (builder.Configuration["Cors:AllowedOrigins"] ?? string.Emp
 
 builder.Services.AddInfrastructure(connectionString);
 
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<GetUsers>();
+builder.Services.AddScoped<GetMaintenanceRequestDetail>();
+builder.Services.AddScoped<CreateMaintenanceRequest>();
+builder.Services.AddScoped<AssignMaintenanceRequest>();
+builder.Services.AddScoped<ChangeMaintenanceRequestStatus>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserProvider, HeaderCurrentUserProvider>();
@@ -32,13 +38,16 @@ builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy
 builder.Services
     .AddControllers(options =>
     {
+        // Keeps the Async suffix in action names so CreatedAtAction(nameof(GetByIdAsync)) resolves.
+        options.SuppressAsyncSuffixInActionNames = false;
         SpanishModelBindingMessages.Apply(options.ModelBindingMessageProvider);
-        // Validation errors are keyed by the JSON name (camelCase), as the client sent them.
-        options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
+        // Otherwise a body that fails to parse adds a second, English "body is required" error.
+        options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
     })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false));
+        options.JsonSerializerOptions.Converters.Add(new UtcDateTimeOffsetConverter());
         options.JsonSerializerOptions.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow;
         // The raw serializer messages mention internal type names.
         options.AllowInputFormatterExceptionMessages = false;
@@ -69,3 +78,6 @@ app.UseCors();
 app.MapControllers();
 
 await app.RunAsync();
+
+// Exposes the entry point to WebApplicationFactory in the integration tests.
+public partial class Program;

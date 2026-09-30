@@ -1,4 +1,7 @@
+using MaintenanceTracker.Application;
+using MaintenanceTracker.Application.MaintenanceRequests;
 using MaintenanceTracker.Application.Users;
+using MaintenanceTracker.Infrastructure.MaintenanceRequests;
 using MaintenanceTracker.Infrastructure.Persistence;
 using MaintenanceTracker.Infrastructure.Users;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +17,9 @@ public static class DependencyInjection
             .UseNpgsql(connectionString)
             .UseSnakeCaseNamingConvention());
 
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IMaintenanceRequestRepository, MaintenanceRequestRepository>();
+        services.AddScoped<IMaintenanceRequestQueries, MaintenanceRequestQueries>();
         services.AddScoped<IUserCatalog, UserCatalog>();
 
         return services;

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using MaintenanceTracker.Application.Errors;
 using MaintenanceTracker.Domain.Errors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,14 @@ internal static class Problems
     {
         [DomainErrorCodes.ValidationFailed] = StatusCodes.Status400BadRequest,
         [ApiErrorCodes.UserRequired] = StatusCodes.Status400BadRequest,
+        [ApplicationErrorCodes.UserNotFound] = StatusCodes.Status400BadRequest,
+        [ApplicationErrorCodes.AssigneeNotFound] = StatusCodes.Status400BadRequest,
+        [ApplicationErrorCodes.MaintenanceRequestNotFound] = StatusCodes.Status404NotFound,
         [DomainErrorCodes.InvalidStatusTransition] = StatusCodes.Status409Conflict,
         [DomainErrorCodes.AssigneeRequired] = StatusCodes.Status409Conflict,
         [DomainErrorCodes.RequestClosed] = StatusCodes.Status409Conflict,
         [DomainErrorCodes.AssigneeUnchanged] = StatusCodes.Status409Conflict,
+        [ApplicationErrorCodes.ConcurrencyConflict] = StatusCodes.Status409Conflict,
         [ApiErrorCodes.InternalError] = StatusCodes.Status500InternalServerError
     };
 

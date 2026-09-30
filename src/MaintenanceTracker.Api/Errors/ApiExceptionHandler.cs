@@ -1,3 +1,4 @@
+using MaintenanceTracker.Application.Errors;
 using MaintenanceTracker.Domain.Errors;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,7 @@ internal sealed class ApiExceptionHandler(
     {
         DomainValidationException e => Problems.Validation(httpContext, Errors(e.Field, e.Message), e.Message),
         DomainException e => Problems.ForCode(httpContext, e.Code, e.Message),
+        UseCaseException e => Problems.ForCode(httpContext, e.Code, e.Message),
         ApiRequestException { Field: not null } e => Problems.Validation(httpContext, Errors(e.Field, e.Message), e.Message),
         ApiRequestException e => Problems.ForCode(httpContext, e.Code, e.Message),
         _ => Problems.ForCode(
