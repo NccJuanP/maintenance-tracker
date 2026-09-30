@@ -19,3 +19,7 @@ export function formatDate(iso: string): string {
 export function formatDateTime(iso: string): string {
   return dateTimeFormatter.format(new Date(iso));
 }
+
+export function shortId(id: string): string {
+  return id.slice(0, 8);
+}

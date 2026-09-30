@@ -22,6 +22,10 @@ export const categoryLabels: Record<Category, string> = {
   Other: "Otros",
 };
 
+export const requestStatuses = Object.keys(statusLabels) as RequestStatus[];
+export const priorities = Object.keys(priorityLabels) as Priority[];
+export const categories = Object.keys(categoryLabels) as Category[];
+
 export function transitionActionLabel(from: RequestStatus, to: RequestStatus): string {
   switch (to) {
     case "InProgress":

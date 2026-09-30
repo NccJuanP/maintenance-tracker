@@ -1,5 +1,6 @@
 "use client";
 
+import { NativeSelect } from "@/components/common/native-select";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
 export function UserSelect() {
@@ -8,8 +9,7 @@ export function UserSelect() {
   return (
     <label className="flex items-center gap-2 text-sm">
       <span className="text-muted-foreground">Usuario actual</span>
-      <select
-        className="h-8 rounded-lg border bg-background px-2 text-sm disabled:opacity-60"
+      <NativeSelect
         value={user?.id ?? ""}
         onChange={(event) => setUserId(event.target.value)}
         disabled={!users}
@@ -20,7 +20,7 @@ export function UserSelect() {
             {candidate.name}
           </option>
         ))}
-      </select>
+      </NativeSelect>
     </label>
   );
 }
