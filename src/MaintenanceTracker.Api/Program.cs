@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using MaintenanceTracker.Api.Binding;
 using MaintenanceTracker.Api.CurrentUser;
 using MaintenanceTracker.Api.Errors;
 using MaintenanceTracker.Api.Serialization;
@@ -22,6 +23,9 @@ builder.Services.AddScoped<GetMaintenanceRequestDetail>();
 builder.Services.AddScoped<CreateMaintenanceRequest>();
 builder.Services.AddScoped<AssignMaintenanceRequest>();
 builder.Services.AddScoped<ChangeMaintenanceRequestStatus>();
+builder.Services.AddScoped<ListMaintenanceRequests>();
+builder.Services.AddScoped<GetMaintenanceRequestActivity>();
+builder.Services.AddScoped<GetRequestSummary>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserProvider, HeaderCurrentUserProvider>();
@@ -40,6 +44,7 @@ builder.Services
     {
         // Keeps the Async suffix in action names so CreatedAtAction(nameof(GetByIdAsync)) resolves.
         options.SuppressAsyncSuffixInActionNames = false;
+        options.ModelBinderProviders.Insert(0, new EnumNameModelBinderProvider());
         SpanishModelBindingMessages.Apply(options.ModelBindingMessageProvider);
         // Otherwise a body that fails to parse adds a second, English "body is required" error.
         options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;

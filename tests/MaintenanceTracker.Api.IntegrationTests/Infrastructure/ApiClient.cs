@@ -52,6 +52,29 @@ internal static class ApiClient
         return await response.ReadDetailAsync();
     }
 
+    public static async Task<Guid> CreateRequestAsync(
+        this HttpClient client, string title, string category, string priority)
+    {
+        var body = new
+        {
+            title,
+            description = "Descripción suficiente para la prueba.",
+            category,
+            priority
+        };
+
+        var response = await client.PostAsUserAsync(MaintenanceRequests, body, TestUsers.Ana);
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        return (await response.ReadDetailAsync()).Id;
+    }
+
+    public static async Task<JsonElement> GetJsonAsync(this HttpClient client, string url)
+    {
+        var response = await client.GetAsync(url);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK, await response.Content.ReadAsStringAsync());
+        return await response.Content.ReadFromJsonAsync<JsonElement>();
+    }
+
     public static async Task<MaintenanceRequestDetail> ReadDetailAsync(this HttpResponseMessage response) =>
         (await response.Content.ReadFromJsonAsync<MaintenanceRequestDetail>(Json))!;
 

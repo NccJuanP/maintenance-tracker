@@ -1,5 +1,6 @@
 using MaintenanceTracker.Api.Contracts;
 using MaintenanceTracker.Api.CurrentUser;
+using MaintenanceTracker.Application;
 using MaintenanceTracker.Application.MaintenanceRequests;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +23,38 @@ public sealed class MaintenanceRequestsController(ICurrentUserProvider currentUs
 
         return CreatedAtAction(nameof(GetByIdAsync), new { id = detail.Id }, detail);
     }
+
+    [HttpGet]
+    public async Task<ActionResult<PagedResult<MaintenanceRequestListItem>>> ListAsync(
+        [FromQuery] MaintenanceRequestListParameters parameters,
+        [FromServices] ListMaintenanceRequests listMaintenanceRequests,
+        CancellationToken cancellationToken)
+    {
+        var query = new MaintenanceRequestListQuery(
+            parameters.Page,
+            parameters.PageSize,
+            parameters.Status,
+            parameters.Priority,
+            parameters.Category,
+            parameters.Search,
+            parameters.SortDirection);
+
+        return Ok(await listMaintenanceRequests.ExecuteAsync(query, cancellationToken));
+    }
+
+    [HttpGet("summary")]
+    public async Task<ActionResult<RequestSummary>> GetSummaryAsync(
+        [FromServices] GetRequestSummary getSummary,
+        CancellationToken cancellationToken) =>
+        Ok(await getSummary.ExecuteAsync(cancellationToken));
+
+    [HttpGet("{id:guid}/activity")]
+    public async Task<ActionResult<PagedResult<ActivityEntryDto>>> GetActivityAsync(
+        Guid id,
+        [FromQuery] PagingParameters paging,
+        [FromServices] GetMaintenanceRequestActivity getActivity,
+        CancellationToken cancellationToken) =>
+        Ok(await getActivity.ExecuteAsync(id, paging.Page, paging.PageSize, cancellationToken));
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<MaintenanceRequestDetail>> GetByIdAsync(
