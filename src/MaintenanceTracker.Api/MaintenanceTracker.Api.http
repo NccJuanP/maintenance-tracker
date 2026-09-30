@@ -1,6 +1,6 @@
-@MaintenanceTracker.Api_HostAddress = http://localhost:5049
+@MaintenanceTracker.Api_HostAddress = http://localhost:8080
 
-GET {{MaintenanceTracker.Api_HostAddress}}/weatherforecast/
+GET {{MaintenanceTracker.Api_HostAddress}}/api/users
 Accept: application/json
 
 ###

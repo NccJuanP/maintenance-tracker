@@ -1,4 +1,6 @@
+using MaintenanceTracker.Application.Users;
 using MaintenanceTracker.Infrastructure.Persistence;
+using MaintenanceTracker.Infrastructure.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +13,8 @@ public static class DependencyInjection
         services.AddDbContext<MaintenanceTrackerDbContext>(options => options
             .UseNpgsql(connectionString)
             .UseSnakeCaseNamingConvention());
+
+        services.AddScoped<IUserCatalog, UserCatalog>();
 
         return services;
     }
