@@ -3,4 +3,4 @@
 **/.vs/
 .git/
 .env
-web/node_modules/
+web/
