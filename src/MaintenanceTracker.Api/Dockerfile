@@ -2,6 +2,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
+COPY Directory.Build.props ./
+COPY src/MaintenanceTracker.Domain/MaintenanceTracker.Domain.csproj src/MaintenanceTracker.Domain/
+COPY src/MaintenanceTracker.Application/MaintenanceTracker.Application.csproj src/MaintenanceTracker.Application/
+COPY src/MaintenanceTracker.Infrastructure/MaintenanceTracker.Infrastructure.csproj src/MaintenanceTracker.Infrastructure/
 COPY src/MaintenanceTracker.Api/MaintenanceTracker.Api.csproj src/MaintenanceTracker.Api/
 RUN dotnet restore src/MaintenanceTracker.Api/MaintenanceTracker.Api.csproj
 

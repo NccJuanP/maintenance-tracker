@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\MaintenanceTracker.Application\MaintenanceTracker.Application.csproj" />
+    <ProjectReference Include="..\MaintenanceTracker.Domain\MaintenanceTracker.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
