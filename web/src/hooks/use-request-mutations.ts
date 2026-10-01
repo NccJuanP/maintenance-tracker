@@ -1,10 +1,19 @@
 import { type QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ApiError } from "@/lib/api/client";
-import { assignMaintenanceRequest, changeMaintenanceRequestStatus } from "@/lib/api/maintenance-requests";
-import type { MaintenanceRequestDetail, RequestStatus } from "@/lib/api/types";
+import {
+  assignMaintenanceRequest,
+  changeMaintenanceRequestStatus,
+  createMaintenanceRequest,
+} from "@/lib/api/maintenance-requests";
+import type { CreateMaintenanceRequestBody, MaintenanceRequestDetail, RequestStatus } from "@/lib/api/types";
 import { statusLabels } from "@/lib/labels";
 import { queryKeys } from "@/lib/query-keys";
+
+interface CreateVariables {
+  body: CreateMaintenanceRequestBody;
+  actorId: string;
+}
 
 interface AssignVariables {
   assigneeId: string;
@@ -14,6 +23,19 @@ interface AssignVariables {
 interface ChangeStatusVariables {
   targetStatus: RequestStatus;
   actorId: string;
+}
+
+export function useCreateRequest() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ body, actorId }: CreateVariables) => createMaintenanceRequest(body, actorId),
+    onSuccess: (created) => {
+      queryClient.setQueryData(queryKeys.requestDetail(created.id), created);
+      queryClient.invalidateQueries({ queryKey: queryKeys.requestLists });
+      queryClient.invalidateQueries({ queryKey: queryKeys.summary });
+    },
+  });
 }
 
 export function useAssignRequest(requestId: string) {
