@@ -2,10 +2,12 @@ import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-qu
 import {
   getActivity,
   getMaintenanceRequest,
+  getSummary,
   listMaintenanceRequests,
 } from "@/lib/api/maintenance-requests";
 import type { MaintenanceRequestQuery } from "@/lib/api/types";
 import { queryKeys } from "@/lib/query-keys";
+
 
 export const activityPageSize = 10;
 
@@ -30,5 +32,12 @@ export function useActivity(id: string) {
     queryFn: ({ pageParam, signal }) => getActivity(id, pageParam, activityPageSize, signal),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined),
+  });
+}
+
+export function useSummary() {
+  return useQuery({
+    queryKey: queryKeys.summary,
+    queryFn: ({ signal }) => getSummary(signal),
   });
 }

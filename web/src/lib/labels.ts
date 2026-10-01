@@ -8,6 +8,14 @@ export const statusLabels: Record<RequestStatus, string> = {
   Cancelled: "Cancelada",
 };
 
+export const statusPluralLabels: Record<RequestStatus, string> = {
+  Pending: "Pendientes",
+  InProgress: "En progreso",
+  OnHold: "En espera",
+  Resolved: "Resueltas",
+  Cancelled: "Canceladas",
+};
+
 export const priorityLabels: Record<Priority, string> = {
   Low: "Baja",
   Medium: "Media",
