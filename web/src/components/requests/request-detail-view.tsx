@@ -12,6 +12,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMaintenanceRequest } from "@/hooks/use-maintenance-requests";
 import { ApiError } from "@/lib/api/client";
+import { RequestActionsCard } from "@/components/requests/request-actions-card";
 
 export function RequestDetailView({ requestId }: { requestId: string }) {
   const { data: request, error, isPending, isError, refetch } = useMaintenanceRequest(requestId);
@@ -55,6 +56,7 @@ export function RequestDetailView({ requestId }: { requestId: string }) {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <aside className="space-y-6 lg:order-last">
+          <RequestActionsCard request={request}/>
           <RequestInfoCard request={request} />
         </aside>
 
