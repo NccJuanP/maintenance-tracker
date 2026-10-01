@@ -1,4 +1,4 @@
-import { PageHeader } from "@/components/common/page-header";
+import { RequestDetailView } from "@/components/requests/request-detail-view";
 
 interface RequestDetailPageProps {
   params: Promise<{ id: string }>;
@@ -7,5 +7,5 @@ interface RequestDetailPageProps {
 export default async function RequestDetailPage({ params }: RequestDetailPageProps) {
   const { id } = await params;
 
-  return <PageHeader title="Detalle de la solicitud" description={`Solicitud ${id}`} />;
+  return <RequestDetailView requestId={id} />;
 }
